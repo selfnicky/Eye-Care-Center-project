@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login / Register</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Login or Register Here</h2>
+
+        <form id="authForm">
+            <label for="username">Username:</label><br>
+            <input type="text" id="username" name="username" required><br><br>
+
+            <label for="password">Password:</label><br>
+            <input type="password" id="password" name="password" required><br><br>
+
+            <button type="submit" id="loginButton">Login</button>
+            <button type="button" id="registerButton">Register</button>
+        </form>
+
+        <p id="message" style="margin-top: 20px; color: red;"></p>
+
+        <a href="/" class="btn" style="margin-top: 20px; display: inline-block;">Back to Home</a>
+    </div>
+
+    <script>
+        const authForm = document.getElementById('authForm');
+        const loginButton = document.getElementById('loginButton');
+        const registerButton = document.getElementById('registerButton');
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const messageElement = document.getElementById('message');
+
+        // Function to handle API calls
+        async function sendAuthRequest(endpoint) {
+            const username = usernameInput.value;
+            const password = passwordInput.value;
+
+            if (!username || !password) {
+                messageElement.textContent = 'Please enter both username and password.';
+                return;
+            }
+
+            try {
+                // The endpoint will be /api/login or /api/register
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    messageElement.style.color = 'green'; // Set message color to green for success
+                    if (endpoint.includes('/login')) {
+                        messageElement.textContent = 'Login successful! Welcome, ' + username + '.';
+                        // In a real app, you'd store the token (data.token) and redirect
+                    } else { // Register
+                        messageElement.textContent = 'Registration successful! You can now log in.';
+                    }
+                    usernameInput.value = ''; // Clear fields on success
+                    passwordInput.value = '';
+                } else {
+                    const errorData = await response.json();
+                    messageElement.style.color = 'red'; // Set message color to red for error
+                    messageElement.textContent = (errorData.message || 'Error: ' + response.statusText);
+                }
+            } catch (error) {
+                messageElement.style.color = 'red'; // Set message color to red for error
+                messageElement.textContent = 'Network error or backend is unreachable: ' + error.message;
+                console.error('Fetch error:', error);
+            }
+        }
+
+        // Event listener for Login button/form submission
+        authForm.addEventListener('submit', (event) => {
+            event.preventDefault(); // Prevent the default form submission (page reload)
+            sendAuthRequest('/api/login'); // Call your backend's login endpoint
+        });
+
+        // Event listener for Register button
+        registerButton.addEventListener('click', () => {
+            sendAuthRequest('/api/register'); // Call your backend's register endpoint
+        });
+    </script>
+</body>
+</html>

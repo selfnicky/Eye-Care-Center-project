@@ -1,0 +1,65 @@
+# Operating System files
+.DS_Store
+Thumbs.db
+
+# Node.js specific
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Terraform specific
+.terraform/
+.terraform.lock.hcl
+*.tfplan
+*.tfstate
+*.tfstate.backup
+crash.log
+override.tf
+override.tf.json
+.terraformrc
+terraform.rc
+# Exclude any specific Terraform provider caches if they are large
+.terraform.d/plugin-cache/
+
+# Docker specific
+*.env
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.DS_Store
+!/.gitkeep # If you use .gitkeep for empty folders
+
+# Kubernetes specific
+# Kubeconfig files
+kubeconfig
+.kube/config
+
+# Credentials and sensitive data (VERY IMPORTANT)
+secrets/
+*.key
+*.pem
+*.p8
+*.pfx
+*.jks
+*.aws/
+.aws/
+config.json # Docker config that might contain credentials
+credentials.json
+credentials.yaml
+id_rsa
+id_rsa.pub
+
+# Specific application sensitive files (adjust based on your project)
+# If your backend or frontend explicitly creates local config files with secrets
+# add them here, e.g.:
+# backend-app/config/local.json
+# backend-app/db_credentials.txt
+
+# Build output directories
+dist/
+build/
+out/
+.next/ # If you were using Next.js for frontend

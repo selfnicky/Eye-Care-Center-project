@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Appointment</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Book an Appointment</h2>
+
+        <form id="appointmentForm">
+            <label for="date">Date:</label><br>
+            <input type="date" id="date" name="date" required><br><br>
+
+            <label for="time">Time:</label><br>
+            <input type="time" id="time" name="time" required><br><br>
+
+            <label for="service">Service:</label><br>
+            <select id="service" name="service" required>
+                <option value="">Select a service</option>
+                <option value="eye-exam">Comprehensive Eye Exam</option>
+                <option value="contact-lens-fitting">Contact Lens Fitting</option>
+                <option value="follow-up">Follow-up Visit</option>
+            </select><br><br>
+
+            <button type="submit">Schedule Appointment</button>
+        </form>
+
+        <p id="message" style="margin-top: 20px; color: red;"></p>
+
+        <a href="/" class="btn" style="margin-top: 20px; display: inline-block;">Back to Home</a>
+    </div>
+
+    <script>
+        const appointmentForm = document.getElementById('appointmentForm');
+        const dateInput = document.getElementById('date');
+        const timeInput = document.getElementById('time');
+        const serviceInput = document.getElementById('service');
+        const messageElement = document.getElementById('message');
+
+        appointmentForm.addEventListener('submit', async (event) => {
+            event.preventDefault(); // Prevent default form submission
+
+            const date = dateInput.value;
+            const time = timeInput.value;
+            const service = serviceInput.value;
+
+            if (!date || !time || !service) {
+                messageElement.textContent = 'Please fill in all fields.';
+                messageElement.style.color = 'red';
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/appointments', { // Assuming your backend has /api/appointments endpoint
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ date, time, service })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    messageElement.style.color = 'green';
+                    messageElement.textContent = 'Appointment scheduled successfully! ID: ' + (data.id || 'N/A');
+                    appointmentForm.reset(); // Clear the form
+                } else {
+                    const errorData = await response.json();
+                    messageElement.style.color = 'red';
+                    messageElement.textContent = 'Failed to schedule appointment: ' + (errorData.message || response.statusText);
+                }
+            } catch (error) {
+                messageElement.style.color = 'red';
+                messageElement.textContent = 'Network error or backend is unreachable: ' + error.message;
+                console.error('Fetch error:', error);
+            }
+        });
+    </script>
+</body>
+</html>

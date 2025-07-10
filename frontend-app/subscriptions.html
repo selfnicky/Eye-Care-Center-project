@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Subscription</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Manage Your Subscription</h2>
+
+        <form id="subscriptionForm">
+            <label for="subscriptionType">Subscription Type:</label><br>
+            <select id="subscriptionType" name="subscriptionType" required>
+                <option value="">Select a plan</option>
+                <option value="basic">Basic Plan</option>
+                <option value="premium">Premium Plan</option>
+                <option value="cancel">Cancel Subscription</option>
+            </select><br><br>
+
+            <label for="email">Your Email:</label><br>
+            <input type="email" id="email" name="email" required><br><br>
+
+            <button type="submit">Update Subscription</button>
+        </form>
+
+        <p id="message" style="margin-top: 20px; color: red;"></p>
+
+        <a href="/" class="btn" style="margin-top: 20px; display: inline-block;">Back to Home</a>
+    </div>
+
+    <script>
+        const subscriptionForm = document.getElementById('subscriptionForm');
+        const subscriptionTypeInput = document.getElementById('subscriptionType');
+        const emailInput = document.getElementById('email');
+        const messageElement = document.getElementById('message');
+
+        subscriptionForm.addEventListener('submit', async (event) => {
+            event.preventDefault(); // Prevent default form submission
+
+            const subscriptionType = subscriptionTypeInput.value;
+            const email = emailInput.value;
+
+            if (!subscriptionType || !email) {
+                messageElement.textContent = 'Please fill in all fields.';
+                messageElement.style.color = 'red';
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/subscriptions', { // Assuming your backend has /api/subscriptions endpoint
+                    method: 'POST', // Or PUT, depending on your backend's design for updates
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ subscriptionType, email })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    messageElement.style.color = 'green';
+                    messageElement.textContent = 'Subscription updated successfully! Status: ' + (data.status || 'N/A');
+                    // subscriptionForm.reset(); // Optionally clear the form
+                } else {
+                    const errorData = await response.json();
+                    messageElement.style.color = 'red';
+                    messageElement.textContent = 'Failed to update subscription: ' + (errorData.message || response.statusText);
+                }
+            } catch (error) {
+                messageElement.style.color = 'red';
+                messageElement.textContent = 'Network error or backend is unreachable: ' + error.message;
+                console.error('Fetch error:', error);
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,25 @@
+# Use a base image with Node.js
+FROM node:18-alpine
+
+# Set the working directory in the container
+WORKDIR /app
+
+# Copy package.json and package-lock.json (if you have one)
+# to install dependencies first to leverage Docker layer caching
+COPY package*.json ./
+
+# Install dependencies
+RUN npm install
+
+# Copy the rest of the application code
+COPY . .
+
+# IMPORTANT:
+# EXPOSE the port your backend application listens on.
+# If your server.js listens on port 8080, change 3000 to 8080.
+EXPOSE 3000
+
+# IMPORTANT:
+# CMD specifies the command to run your application.
+# If your main entry file is NOT "server.js", change "server.js" to the correct filename.
+CMD [ "node", "server.js" ]

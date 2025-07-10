@@ -1,0 +1,25 @@
+# Save this as kubernetes/frontend-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-deployment
+  labels:
+    app: frontend
+spec:
+  replicas: 2 # You can adjust this number
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+      - name: frontend
+        image: 819313480446.dkr.ecr.us-east-1.amazonaws.com/frontend-app:latest # Your ECR Frontend URL
+        ports:
+        - containerPort: 80 # IMPORTANT: This should be the port your Nginx frontend serves on
+        env:
+        - name: REACT_APP_BACKEND_URL
+          value: /api # Frontend will now make relative calls like /api/register

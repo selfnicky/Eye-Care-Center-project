@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-deployment
+  labels:
+    app: backend
+spec:
+  replicas: 2 # Start with 2 replicas
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+      - name: backend-app
+        # Replace with your ECR URL from terraform outputs!
+        image: 819313480446.dkr.ecr.us-east-1.amazonaws.com/backend-app:latest
+        ports:
+        - containerPort: 3000 # Node.js app port
+        envFrom:
+        # Inject environment variables from a Secret
+        - secretRef:
+            name: db-credentials
+        env:
+        # Other environment variables (non-sensitive)
+        - name: DB_HOST
+          value: eye-care-db-instance.csmqmjhuowx3.us-east-1.rds.amazonaws.com # e.g., eye-care-db-instance.xxxxxxxxxx.us-east-1.rds.amazonaws.com
+        - name: DB_NAME
+          value: "eyecaredb" # Default DB name
+        - name: DB_PORT
+          value: "5432"
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "200m"
+          limits:
+            memory: "256Mi"
+            cpu: "400m"
